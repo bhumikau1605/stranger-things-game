@@ -373,10 +373,95 @@ button, input, .btn-check, .btn-popup {
       50%      { opacity: 0.3; }
     }
 
+    /* Setup screen */
+    .setup-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,14,25,0.97);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .setup-screen.hidden { display: none; }
+    .setup-box {
+      background: var(--navy);
+      border: 1px solid var(--slate);
+      border-radius: 18px;
+      padding: 40px 36px;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .setup-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.8rem;
+      letter-spacing: 4px;
+      color: var(--orange);
+    }
+    .setup-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      color: var(--fog);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .setup-inputs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .setup-box-input {
+      width: 60px; height: 60px;
+      background: var(--purple);
+      border: 2px solid var(--slate);
+      border-radius: 10px;
+      text-align: center;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.8rem;
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.2s;
+      caret-color: var(--orange);
+      text-transform: uppercase;
+    }
+    .setup-box-input:focus { border-color: var(--orange); box-shadow: 0 0 12px rgba(199,90,26,0.4); }
+    .btn-generate {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--orange), var(--darkorange));
+      border: none;
+      border-radius: 10px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      color: var(--cream);
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(199,90,26,0.3);
+    }
+    .btn-generate:hover { transform: translateY(-2px); }
+
     /* Uptime light string decoration */
   </style>
 </head>
 <body>
+
+<!-- Setup screen -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-box">
+    <div class="setup-title">🔦 Set The Code</div>
+    <div>
+      <div class="setup-label">Enter 4 letters (a – z)</div>
+      <div class="setup-inputs" id="setupInputs"></div>
+    </div>
+    <button class="btn-generate" onclick="generateCode()">Generate Code ⚡</button>
+  </div>
+</div>
 
 <!-- Audio -->
 <audio id="themeSong" src="theme.mp3" loop></audio>
@@ -432,7 +517,7 @@ button, input, .btn-check, .btn-popup {
 </div>
 
 <script>
-  const LETTERS = ['a','b','c','d'];
+  let LETTERS = [];
   let correctCode = [];
   let round = 1;
   let cracked = 0;
@@ -453,6 +538,44 @@ button, input, .btn-check, .btn-popup {
 
   function playVictory() {
     document.getElementById('victorySound').play();
+  }
+
+  // ── Setup screen ──────────────────────────────────────────────────────────
+  function initSetup() {
+    const container = document.getElementById('setupInputs');
+    for (let i = 0; i < 4; i++) {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.maxLength = 1;
+      inp.className = 'setup-box-input';
+      inp.id = `sbox${i}`;
+      inp.setAttribute('autocomplete', 'off');
+      inp.addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+        if (e.target.value && i < 3) document.getElementById(`sbox${i+1}`).focus();
+      });
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !e.target.value && i > 0)
+          document.getElementById(`sbox${i-1}`).focus();
+        if (e.key === 'Enter') generateCode();
+      });
+      container.appendChild(inp);
+    }
+    document.getElementById('sbox0').focus();
+  }
+
+  function generateCode() {
+    const vals = [0,1,2,3].map(i => document.getElementById(`sbox${i}`).value.toLowerCase());
+    if (vals.some(v => !v)) {
+      document.querySelectorAll('.setup-box-input').forEach(el => {
+        el.style.borderColor = '#e53935';
+        setTimeout(() => el.style.borderColor = '', 600);
+      });
+      return;
+    }
+    LETTERS = vals;
+    document.getElementById('setupScreen').classList.add('hidden');
+    newCode();
   }
 
   // ── Generate shuffled code ────────────────────────────────────────────────
@@ -499,9 +622,10 @@ button, input, .btn-check, .btn-popup {
       inp.id = `box${i}`;
       inp.setAttribute('autocomplete', 'off');
       inp.addEventListener('input', e => {
-        const val = e.target.value.toLowerCase().replace(/[^a-d]/g, '');
-        e.target.value = val;
-        if (val && i < 3) document.getElementById(`box${i+1}`).focus();
+        const val = e.target.value.toLowerCase().replace(/[^a-z]/g, '');
+        const filtered = LETTERS.includes(val) ? val : '';
+        e.target.value = filtered;
+        if (filtered && i < 3) document.getElementById(`box${i+1}`).focus();
       });
       inp.addEventListener('keydown', e => {
         if (e.key === 'Backspace' && !e.target.value && i > 0)
@@ -658,7 +782,7 @@ button, input, .btn-check, .btn-popup {
   // ── Init ──────────────────────────────────────────────────────────────────
   spawnParticles();
   spawnLights();
-  newCode();
+  initSetup();
 </script>
 </body>
 </html>
