@@ -48,8 +48,10 @@ Each team gets their own page. A secret 4-letter code is generated using the let
 
 ## 🚀 Deployment
 
-Deployed via [Vercel](https://vercel.com) — no build step required, pure static files.
+Deployed via GithubPages
 
 ---
+
+Augment AI: Stranger Things @Utsav '26
 
 > *"Friends don't lie."* — Eleven
