@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stranger Things — Team 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    * {
+  cursor: url('hellfire-normal.png') 16 16, auto !important;
+}
+
+button, input, .btn-check, .btn-popup {
+  cursor: url('hellfire-pointer.png') 20 20, pointer !important;
+}
+
+    :root {
+      --black:   #0F0E19;
+      --navy:    #161724;
+      --purple:  #231B25;
+      --slate:   #312D3A;
+      --rust:    #3B1D1F;
+      --copper:  #58302F;
+      --amber:   #A57258;
+      --cream:   #E7D8C2;
+      --orange:  #7A2FA8;
+      --darkorange: #5a1f8a;
+      --purpleglow: #C75A1A;
+      --fog:     #ffffff;
+    }
+
+    body {
+      background-color: var(--black);
+      background-image: url('bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--cream);
+      font-family: 'Special Elite', cursive;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Flickering particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: float linear infinite;
+      opacity: 0;
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    /* Fog overlay */
+    .fog {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(15,14,25,0.85) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Flicker animation for title */
+    @keyframes flicker {
+      0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; text-shadow: 0 0 20px #C75A1A, 0 0 40px #9D4716, 0 0 80px #C75A1A; }
+      20%,24%,55% { opacity: 0.4; text-shadow: none; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      padding: 20px 20px 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Header */
+    .header { text-align: center; }
+
+    .team-badge {
+      display: inline-block;
+      background: var(--rust);
+      border: 1px solid var(--copper);
+      color: var(--amber);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      padding: 4px 16px;
+      border-radius: 2px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(3rem, 12vw, 5.5rem);
+      letter-spacing: 6px;
+      color: var(--purple);
+      animation: flicker 4s infinite;
+      line-height: 1;
+      margin-top: 20px;
+    }
+
+    .subtitle {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      color: var(--white);
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* Round & Score */
+    .stats {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+    }
+    .stat-box {
+      background: var(--navy);
+      border: 1px solid var(--slate);
+      border-radius: 8px;
+      padding: 10px 24px;
+      text-align: center;
+    }
+    .stat-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: var(--fog);
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2rem;
+      color: var(--orange);
+      line-height: 1.2;
+    }
+
+    /* Letters display */
+
+    .letters-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      color: var(--fog);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .letters-row {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+    }
+    .letter-tile {
+      width: 64px; height: 64px;
+      background: var(--purple);
+      border: 2px solid var(--copper);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.2rem;
+      color: var(--amber);
+      box-shadow: 0 0 12px rgba(165,114,88,0.2);
+      animation: tileIn 0.4s ease forwards;
+      opacity: 0;
+    }
+  
+
+    /* Input section */
+    .input-section {
+      width: 100%;
+      background: var(--navy);
+      border: 1px solid var(--slate);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .input-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      color: var(--fog);
+      text-transform: uppercase;
+    }
+
+    .code-inputs {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .code-box {
+      width: 64px; height: 64px;
+      background: var(--purple);
+      border: 2px solid var(--slate);
+      border-radius: 10px;
+      text-align: center;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2rem;
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-transform: lowercase;
+      caret-color: var(--orange);
+    }
+    .code-box:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 12px rgba(199,90,26,0.4);
+    }
+    .code-box.correct-input { border-color: #4caf50; box-shadow: 0 0 12px rgba(76,175,80,0.4); }
+    .code-box.wrong-input   { border-color: #e53935; box-shadow: 0 0 12px rgba(229,57,53,0.4); animation: shake 0.3s ease; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+
+    .btn-check {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--orange), var(--darkorange));
+      border: none;
+      border-radius: 10px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      color: var(--cream);
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(199,90,26,0.3);
+    }
+    .btn-check:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(199,90,26,0.5); }
+    .btn-check:active { transform: translateY(0); }
+
+    /* Attempts */
+    .attempts {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: var(--fog);
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .attempts span { color: var(--amber); }
+
+    /* Popup overlay */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(15,14,25,0.92);
+      z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .overlay.show { opacity: 1; pointer-events: all; }
+
+    .popup {
+      background: var(--navy);
+      border-radius: 18px;
+      padding: 40px 36px;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+      display: flex; flex-direction: column; gap: 16px;
+      transform: scale(0.85);
+      transition: transform 0.3s;
+    }
+    .overlay.show .popup { transform: scale(1); }
+
+    .popup-icon { font-size: 3.5rem; }
+    .popup-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.2rem;
+      letter-spacing: 3px;
+    }
+    .popup-title.success { color: #4caf50; text-shadow: 0 0 20px rgba(76,175,80,0.5); }
+    .popup-title.fail    { color: var(--orange); text-shadow: 0 0 20px rgba(199,90,26,0.5); }
+    .popup-msg {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.95rem;
+      color: var(--cream);
+      line-height: 1.6;
+    }
+    .popup-sub {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--fog);
+      letter-spacing: 2px;
+    }
+
+    .popup .border-line {
+      width: 60px; height: 2px;
+      background: linear-gradient(to right, transparent, var(--orange), transparent);
+      margin: 0 auto;
+    }
+
+    .btn-popup {
+      padding: 12px 32px;
+      border: none; border-radius: 10px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.2rem; letter-spacing: 2px;
+      cursor: pointer; transition: all 0.2s;
+      margin: 0 auto;
+    }
+    .btn-popup.success-btn {
+      background: linear-gradient(135deg, #2e7d32, #4caf50);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(76,175,80,0.3);
+    }
+    .btn-popup.fail-btn {
+      background: linear-gradient(135deg, var(--darkorange), var(--orange));
+      color: var(--cream);
+      box-shadow: 0 4px 16px rgba(199,90,26,0.3);
+    }
+    .btn-popup:hover { transform: translateY(-2px); }
+
+    /* Success confetti burst */
+    @keyframes burst {
+      0%   { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    }
+    .burst-particle {
+      position: fixed;
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 200;
+      animation: burst 0.8s ease forwards;
+    }
+
+    /* Christmas lights */
+    .lights {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 80px;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .lights svg { width: 100%; height: 100%; }
+    .light-bulb {
+      animation: lightFlicker 2s infinite;
+    }
+    @keyframes lightFlicker {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.3; }
+    }
+
+    /* Uptime light string decoration */
+  </style>
+</head>
+<body>
+
+<!-- Audio -->
+<audio id="themeSong" src="theme.mp3" loop></audio>
+<audio id="victorySound" src="victory.mp3"></audio>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+<div class="fog"></div>
+
+<!-- Christmas lights -->
+<div class="lights" id="lights"><svg id="lightsSvg"></svg></div>
+
+<!-- Popup -->
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    <div class="popup-icon" id="popupIcon"></div>
+    <div class="border-line"></div>
+    <div class="popup-title" id="popupTitle"></div>
+    <div class="popup-msg"  id="popupMsg"></div>
+    <div class="popup-sub"  id="popupSub"></div>
+    <button class="btn-popup" id="popupBtn" onclick="closePopup()"></button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <div class="team-badge">⚡ Team 2 — The Upside Down</div>
+    <div class="title">Stranger<br/>Things</div>
+    <div class="subtitle">◈ crack the upside down code ◈</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-label">Cracked</div>
+      <div class="stat-value" id="crackedNum">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Attempts</div>
+      <div class="stat-value" id="attemptsNum">0</div>
+    </div>
+  </div>
+
+  <div class="letters-section">
+    <div class="letters-row" id="lettersRow"></div>
+  </div>
+
+  <div class="input-section">
+    <div class="input-label">⌨ enter the code</div>
+    <div class="code-inputs" id="codeInputs"></div>
+    <button class="btn-check" onclick="checkCode()">Check Code</button>
+    <div class="attempts">Total attempts this round: <span id="roundAttempts">0</span></div>
+  </div>
+</div>
+
+<script>
+  const LETTERS = ['a','b','c','d'];
+  let correctCode = [];
+  let round = 1;
+  let cracked = 0;
+  let totalAttempts = 0;
+  let roundAttempts = 0;
+
+  // ── Audio ────────────────────────────────────────────────────────────────
+  let themeStarted = false;
+  function startTheme() {
+    if (themeStarted) return;
+    themeStarted = true;
+    const theme = document.getElementById('themeSong');
+    theme.volume = 0.6;
+    theme.play();
+  }
+  document.addEventListener('click', startTheme, { once: true });
+  document.addEventListener('keydown', startTheme, { once: true });
+
+  function playVictory() {
+    document.getElementById('victorySound').play();
+  }
+
+  // ── Generate shuffled code ────────────────────────────────────────────────
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function newCode() {
+    correctCode = shuffle(LETTERS);
+    roundAttempts = 0;
+    document.getElementById('roundAttempts').textContent = 0;
+    renderLetters();
+    renderInputs();
+  }
+
+  // ── Render shuffled letters ───────────────────────────────────────────────
+  function renderLetters() {
+    const shuffledDisplay = shuffle(LETTERS);
+    const row = document.getElementById('lettersRow');
+    row.innerHTML = '';
+    shuffledDisplay.forEach((l, i) => {
+      const tile = document.createElement('div');
+      tile.className = 'letter-tile';
+      tile.textContent = l.toUpperCase();
+      tile.style.animationDelay = `${i * 0.1}s`;
+      row.appendChild(tile);
+    });
+  }
+
+  // ── Render input boxes ────────────────────────────────────────────────────
+  function renderInputs() {
+    const container = document.getElementById('codeInputs');
+    container.innerHTML = '';
+    for (let i = 0; i < 4; i++) {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.maxLength = 1;
+      inp.className = 'code-box';
+      inp.id = `box${i}`;
+      inp.setAttribute('autocomplete', 'off');
+      inp.addEventListener('input', e => {
+        const val = e.target.value.toLowerCase().replace(/[^a-d]/g, '');
+        e.target.value = val;
+        if (val && i < 3) document.getElementById(`box${i+1}`).focus();
+      });
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !e.target.value && i > 0)
+          document.getElementById(`box${i-1}`).focus();
+        if (e.key === 'Enter') checkCode();
+      });
+      container.appendChild(inp);
+    }
+    document.getElementById('box0').focus();
+  }
+
+  // ── Check code ────────────────────────────────────────────────────────────
+  function checkCode() {
+    const entered = [0,1,2,3].map(i => document.getElementById(`box${i}`).value.toLowerCase());
+    if (entered.some(v => !v)) { showFail('incomplete'); return; }
+
+    roundAttempts++;
+    totalAttempts++;
+    document.getElementById('roundAttempts').textContent = roundAttempts;
+    document.getElementById('attemptsNum').textContent = totalAttempts;
+
+    if (entered.join('') === correctCode.join('')) {
+      cracked++;
+      document.getElementById('crackedNum').textContent = cracked;
+      playVictory();
+      showSuccess();
+    } else {
+      [0,1,2,3].forEach(i => {
+        const box = document.getElementById(`box${i}`);
+        box.classList.add('wrong-input');
+        setTimeout(() => box.classList.remove('wrong-input'), 500);
+      });
+      showFail('wrong');
+    }
+  }
+
+  // ── Popups ────────────────────────────────────────────────────────────────
+  function showSuccess() {
+    spawnBurst();
+    document.getElementById('popupIcon').textContent  = '🔦';
+    document.getElementById('popupTitle').textContent = 'Code Cracked!';
+    document.getElementById('popupTitle').className   = 'popup-title success';
+    document.getElementById('popupMsg').textContent   = `The Upside Down has been breached. You cracked the code in ${roundAttempts} attempt${roundAttempts > 1 ? 's' : ''}!`;
+    document.getElementById('popupSub').textContent   = `round ${round} complete — next code incoming`;
+    document.getElementById('popupBtn').textContent   = 'Next Code →';
+    document.getElementById('popupBtn').className     = 'btn-popup success-btn';
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function showFail(type) {
+    const msgs = {
+      wrong:      ['The demogorgon laughs...', 'Wrong code. The Upside Down remains sealed. Try again!'],
+      incomplete: ['Missing letters!', 'Enter all 4 letters before checking the code.'],
+    };
+    document.getElementById('popupIcon').textContent  = '👁️';
+    document.getElementById('popupTitle').textContent = msgs[type][0];
+    document.getElementById('popupTitle').className   = 'popup-title fail';
+    document.getElementById('popupMsg').textContent   = msgs[type][1];
+    document.getElementById('popupSub').textContent   = 'the code remains hidden...';
+    document.getElementById('popupBtn').textContent   = 'Try Again';
+    document.getElementById('popupBtn').className     = 'btn-popup fail-btn';
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function closePopup() {
+    document.getElementById('overlay').classList.remove('show');
+    const title = document.getElementById('popupTitle');
+    if (title.classList.contains('success')) {
+      round++;
+      document.getElementById('roundNum').textContent = round;
+      newCode();
+    } else {
+      // Clear inputs and refocus
+      [0,1,2,3].forEach(i => document.getElementById(`box${i}`).value = '');
+      document.getElementById('box0').focus();
+    }
+  }
+
+  // ── Confetti burst ────────────────────────────────────────────────────────
+  function spawnBurst() {
+    const colors = ['#C75A1A','#A57258','#E7D8C2','#7A2FA8','#4caf50','#FFD700'];
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'burst-particle';
+      p.style.cssText = `
+        left: 50%; top: 50%;
+        background: ${colors[Math.floor(Math.random()*colors.length)]};
+        --tx: ${(Math.random()-0.5)*400}px;
+        --ty: ${(Math.random()-0.5)*400}px;
+        animation-duration: ${0.6 + Math.random()*0.6}s;
+      `;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1200);
+    }
+  }
+
+  // ── Floating particles ────────────────────────────────────────────────────
+  function spawnParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 25; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.cssText = `
+        left: ${Math.random()*100}%;
+        animation-duration: ${6 + Math.random()*10}s;
+        animation-delay: ${Math.random()*8}s;
+        width: ${1+Math.random()*3}px;
+        height: ${1+Math.random()*3}px;
+        background: ${Math.random()>0.5 ? '#C75A1A' : '#7A2FA8'};
+      `;
+      container.appendChild(p);
+    }
+  }
+
+  // ── Christmas lights ──────────────────────────────────────────────────────
+  function spawnLights() {
+    const colors = ['#C75A1A','#7A2FA8','#E7D8C2','#A57258','#46526A','#4caf50','#FFD700'];
+    const svg = document.getElementById('lightsSvg');
+    const W = window.innerWidth, H = 80, total = 20;
+    const ns = 'http://www.w3.org/2000/svg';
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('preserveAspectRatio', 'none');
+
+    // Single U-shaped wire path
+    const wire = document.createElementNS(ns, 'path');
+    wire.setAttribute('d', `M0,0 Q${W/2},${H} ${W},0`);
+    wire.setAttribute('stroke', '#555');
+    wire.setAttribute('stroke-width', '1.5');
+    wire.setAttribute('fill', 'none');
+    svg.appendChild(wire);
+
+    // Place bulbs along the curve
+    for (let i = 0; i < total; i++) {
+      const t = i / (total - 1);
+      const x = t * W;
+      const y = (1 - (2*t-1)**2) * H;
+      const g = document.createElementNS(ns, 'g');
+      g.setAttribute('class', 'light-bulb');
+      g.style.animationDelay = `${Math.random()*2}s`;
+      g.style.animationDuration = `${1+Math.random()*2}s`;
+      const rect = document.createElementNS(ns, 'rect');
+      rect.setAttribute('x', x - 5);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', '10');
+      rect.setAttribute('height', '14');
+      rect.setAttribute('rx', '3');
+      rect.setAttribute('fill', colors[i % colors.length]);
+      rect.setAttribute('filter', `drop-shadow(0 0 4px ${colors[i % colors.length]})`);
+      g.appendChild(rect);
+      svg.appendChild(g);
+    }
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  spawnParticles();
+  spawnLights();
+  newCode();
+</script>
+</body>
+</html>
