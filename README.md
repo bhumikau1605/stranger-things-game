@@ -20,7 +20,7 @@ Each team gets their own page. A secret 4-letter code is generated using the let
 
 | Team | Link | Theme |
 |------|------|-------|
-| ⚡ Team 1 — The Hawkins Lab | ['/team1.html'](https://bhumikau1605.github.io/stranger-things-game/team1.html) | Orange / Rust |
+| ⚡ Team 1 — The Hawkins Lab | [`/team1.html`](https://bhumikau1605.github.io/stranger-things-game/team1.html) | Orange / Rust |
 | 🌀 Team 2 — The Upside Down | [`/team2.html`](https://bhumikau1605.github.io/stranger-things-game/team2.html) | Purple / Dark |
 
 ---
